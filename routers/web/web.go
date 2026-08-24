@@ -20,7 +20,6 @@ import (
 	"gitea.dev/modules/setting"
 	"gitea.dev/modules/storage"
 	"gitea.dev/modules/structs"
-	"gitea.dev/modules/validation"
 	"gitea.dev/modules/web"
 	"gitea.dev/modules/web/middleware"
 	"gitea.dev/modules/web/routing"
@@ -345,8 +344,6 @@ func addProjectBoardRoutes(m *web.Router) {
 
 // registerWebRoutes register routes
 func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
-	validation.AddBindingRules()
-
 	// middleware: required to be signed in or signed out
 	reqSignIn := verifyAuthWithOptions(&common.VerifyOptions{SignInRequired: true})
 	reqSignOut := verifyAuthWithOptions(&common.VerifyOptions{SignOutRequired: true})
@@ -811,9 +808,12 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 			m.Get("/{userid}", admin.ViewUser)
 			m.Combo("/{userid}/edit").Get(admin.EditUser).Post(web.Bind[*forms.AdminEditUserForm](), admin.EditUserPost)
 			m.Post("/{userid}/impersonate", admin.ImpersonateUser)
+			m.Post("/{userid}/convert_type", admin.ConvertUserType)
 			m.Post("/{userid}/delete", admin.DeleteUser)
 			m.Post("/{userid}/avatar", web.Bind[*forms.AvatarForm](), admin.AvatarPost)
 			m.Post("/{userid}/avatar/delete", admin.DeleteAvatar)
+			m.Post("/{userid}/access_tokens", web.Bind[*forms.NewAccessTokenForm](), admin.NewBotTokenPost)
+			m.Post("/{userid}/access_tokens/delete", admin.DeleteBotToken)
 		})
 
 		m.Group("/badges", func() {

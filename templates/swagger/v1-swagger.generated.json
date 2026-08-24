@@ -628,6 +628,76 @@
         }
       }
     },
+    "/admin/packages": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "List all packages",
+        "operationId": "adminListPackages",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "page number of results to return (1-based)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "page size of results",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "alpine",
+              "cargo",
+              "chef",
+              "composer",
+              "conan",
+              "conda",
+              "container",
+              "cran",
+              "debian",
+              "generic",
+              "go",
+              "helm",
+              "maven",
+              "npm",
+              "nuget",
+              "pub",
+              "pypi",
+              "rpm",
+              "rubygems",
+              "swift",
+              "terraform",
+              "vagrant"
+            ],
+            "type": "string",
+            "description": "package type filter",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "name filter",
+            "name": "q",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/PackageList"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          }
+        }
+      }
+    },
     "/admin/unadopted": {
       "get": {
         "produces": [
@@ -1064,6 +1134,52 @@
           },
           "422": {
             "$ref": "#/responses/validationError"
+          }
+        }
+      }
+    },
+    "/admin/users/{username}/convert-type": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Convert a user between the individual and bot types",
+        "operationId": "adminConvertUserType",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "username of the user to convert",
+            "name": "username",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ConvertUserTypeOption"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/empty"
+          },
+          "400": {
+            "$ref": "#/responses/error"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/notFound"
           }
         }
       }
@@ -19703,6 +19819,9 @@
           "204": {
             "$ref": "#/responses/empty"
           },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          },
           "404": {
             "$ref": "#/responses/notFound"
           },
@@ -19749,6 +19868,9 @@
         "responses": {
           "204": {
             "$ref": "#/responses/empty"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
           },
           "404": {
             "$ref": "#/responses/notFound"
@@ -26591,6 +26713,21 @@
           "description": "URL is the API URL for this file or directory",
           "type": "string",
           "x-go-name": "URL"
+        }
+      },
+      "x-go-package": "gitea.dev/modules/structs"
+    },
+    "ConvertUserTypeOption": {
+      "description": "ConvertUserTypeOption options when converting a user between individual and bot",
+      "type": "object",
+      "required": [
+        "user_type"
+      ],
+      "properties": {
+        "user_type": {
+          "description": "The target user type: \"individual\" or \"bot\"",
+          "type": "string",
+          "x-go-name": "UserType"
         }
       },
       "x-go-package": "gitea.dev/modules/structs"

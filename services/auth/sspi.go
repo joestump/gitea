@@ -118,10 +118,15 @@ func (s *SSPI) Verify(req *http.Request, w http.ResponseWriter, store DataStore,
 			log.Error("CreateUser: %v", err)
 			return nil, err
 		}
+	} else if !user.IsIndividual() {
+		// only individual users may sign in; a bot/organization account whose name
+		// matches a domain account must not be authenticated
+		log.Trace("SSPI Authorization: user %q is not an individual, ignoring", username)
+		return nil, nil //nolint:nilnil // the auth method is not applicable
 	}
 
 	if s.CreateSession {
-		handleSignIn(w, req, sess, user)
+		handleSignInNonInteractive(w, req, sess, user)
 	}
 
 	log.Trace("SSPI Authorization: Logged in user %-v", user)

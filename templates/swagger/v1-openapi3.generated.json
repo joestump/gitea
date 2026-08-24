@@ -3707,6 +3707,21 @@
         "type": "object",
         "x-go-package": "gitea.dev/modules/structs"
       },
+      "ConvertUserTypeOption": {
+        "description": "ConvertUserTypeOption options when converting a user between individual and bot",
+        "properties": {
+          "user_type": {
+            "description": "The target user type: \"individual\" or \"bot\"",
+            "type": "string",
+            "x-go-name": "UserType"
+          }
+        },
+        "required": [
+          "user_type"
+        ],
+        "type": "object",
+        "x-go-package": "gitea.dev/modules/structs"
+      },
       "CreateAccessTokenOption": {
         "description": "CreateAccessTokenOption options when create access token",
         "properties": {
@@ -11685,6 +11700,81 @@
         ]
       }
     },
+    "/admin/packages": {
+      "get": {
+        "operationId": "adminListPackages",
+        "parameters": [
+          {
+            "description": "page number of results to return (1-based)",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "page size of results",
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "package type filter",
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "enum": [
+                "alpine",
+                "cargo",
+                "chef",
+                "composer",
+                "conan",
+                "conda",
+                "container",
+                "cran",
+                "debian",
+                "generic",
+                "go",
+                "helm",
+                "maven",
+                "npm",
+                "nuget",
+                "pub",
+                "pypi",
+                "rpm",
+                "rubygems",
+                "swift",
+                "terraform",
+                "vagrant"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "name filter",
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PackageList"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          }
+        },
+        "summary": "List all packages",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/admin/unadopted": {
       "get": {
         "operationId": "adminUnadoptedList",
@@ -12143,6 +12233,51 @@
           }
         },
         "summary": "Add a badge to a user",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/admin/users/{username}/convert-type": {
+      "post": {
+        "operationId": "adminConvertUserType",
+        "parameters": [
+          {
+            "description": "username of the user to convert",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertUserTypeOption"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/empty"
+          },
+          "400": {
+            "$ref": "#/components/responses/error"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          }
+        },
+        "summary": "Convert a user between the individual and bot types",
         "tags": [
           "admin"
         ]
@@ -32244,6 +32379,9 @@
           "204": {
             "$ref": "#/components/responses/empty"
           },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/notFound"
           },
@@ -32340,6 +32478,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/empty"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
           },
           "404": {
             "$ref": "#/components/responses/notFound"
